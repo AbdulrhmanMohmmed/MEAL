@@ -29,7 +29,7 @@ def unread_count(db: Session = Depends(get_db), user=Depends(get_current_user)):
 
 @router.put("/{notification_id}/read")
 def mark_read(notification_id: int, db: Session = Depends(get_db), user=Depends(get_current_user)):
-    n = db.query(Notification).filter(Notification.id == notification_id).first()
+    n = db.query(Notification).filter(Notification.id == notification_id, Notification.user_id == user.id).first()
     if n:
         n.is_read = True
         db.commit()

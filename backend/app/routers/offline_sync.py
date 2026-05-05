@@ -16,16 +16,6 @@ def sync_offline_data(data: dict, db: Session = Depends(get_db), user=Depends(ge
 
     for item in items:
         try:
-            queue_entry = OfflineQueue(
-                device_id=data.get("device_id", "unknown"),
-                action=item.get("action", "create"),
-                resource_type=item.get("type"),
-                data=item.get("data"),
-                synced=True,
-                synced_at=datetime.utcnow()
-            )
-            db.add(queue_entry)
-
             if item.get("type") == "form_submission":
                 submission = FormSubmission(
                     form_id=item["data"]["form_id"],
@@ -42,6 +32,15 @@ def sync_offline_data(data: dict, db: Session = Depends(get_db), user=Depends(ge
                 b = Beneficiary(**{k: v for k, v in ben_data.items() if hasattr(Beneficiary, k)})
                 db.add(b)
 
+            queue_entry = OfflineQueue(
+                device_id=data.get("device_id", "unknown"),
+                action=item.get("action", "create"),
+                resource_type=item.get("type"),
+                data=item.get("data"),
+                synced=True,
+                synced_at=datetime.utcnow()
+            )
+            db.add(queue_entry)
             synced_count += 1
         except Exception as e:
             errors.append({"item": item.get("id"), "error": str(e)})
