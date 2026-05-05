@@ -38,10 +38,11 @@ def list_complaints(
 
 @router.post("/complaints")
 def create_complaint(data: dict, db: Session = Depends(get_db), user=Depends(get_current_user)):
-    count = db.query(Complaint).count()
-    data["reference_number"] = f"CFM-{datetime.now().year}-{count + 1:04d}"
+    data.pop("reference_number", None)
     c = Complaint(**{k: v for k, v in data.items() if hasattr(Complaint, k)})
     db.add(c)
+    db.flush()
+    c.reference_number = f"CFM-{datetime.now().year}-{c.id:04d}"
     db.commit()
     db.refresh(c)
     return {"id": c.id, "reference_number": c.reference_number}

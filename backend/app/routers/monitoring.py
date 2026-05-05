@@ -83,18 +83,32 @@ def indicator_performance_tracking(
     if project_id:
         query = query.filter(Indicator.project_id == project_id)
     indicators = query.all()
-    result = []
+    months_set = set()
+    indicator_rows = []
     for i in indicators:
         measurements = db.query(Measurement).filter(Measurement.indicator_id == i.id).order_by(Measurement.date).all()
-        result.append({
-            "indicator": {
-                "id": i.id, "name": i.name, "type": i.indicator_type,
-                "baseline": i.baseline, "target": i.target, "current": i.current_value
-            },
-            "measurements": [{"date": str(m.date), "value": m.value} for m in measurements],
-            "achievement_rate": round((i.current_value / i.target * 100) if i.target > 0 else 0, 1)
+        monthly_map = {}
+        for m in measurements:
+            month_label = str(m.date)[:7]
+            months_set.add(month_label)
+            monthly_map[month_label] = m.value
+        indicator_rows.append({
+            "indicator": i,
+            "monthly_map": monthly_map,
+            "measurements": measurements,
         })
-    return result
+    months = sorted(months_set)
+    result_indicators = []
+    for row in indicator_rows:
+        i = row["indicator"]
+        progress = round((i.current_value / i.target * 100) if i.target and i.target > 0 else 0, 1)
+        result_indicators.append({
+            "name": i.name, "type": i.indicator_type, "unit": i.unit,
+            "baseline": i.baseline, "target": i.target, "current": i.current_value,
+            "monthly_values": [round(row["monthly_map"].get(m, 0), 1) for m in months],
+            "progress": progress,
+        })
+    return {"indicators": result_indicators, "months": months}
 
 
 @router.get("/summary")
