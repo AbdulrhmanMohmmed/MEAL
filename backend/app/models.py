@@ -214,6 +214,148 @@ class Currency(str, enum.Enum):
     EUR = "EUR"
 
 
+class ReportType(str, enum.Enum):
+    PROJECT_PROGRESS = "project_progress"
+    BENEFICIARY_LIST = "beneficiary_list"
+    FINANCIAL_SUMMARY = "financial_summary"
+    INDICATOR_TRACKING = "indicator_tracking"
+    DISTRIBUTION_REPORT = "distribution_report"
+    SURVEY_ANALYSIS = "survey_analysis"
+    CUSTOM = "custom"
+
+
+class LessonCategory(str, enum.Enum):
+    PROGRAM = "program"
+    OPERATIONS = "operations"
+    COORDINATION = "coordination"
+    MONITORING = "monitoring"
+    FINANCE = "finance"
+    HR = "hr"
+    LOGISTICS = "logistics"
+    PROTECTION = "protection"
+    OTHER = "other"
+
+
+class LogFrameLevel(str, enum.Enum):
+    GOAL = "goal"
+    PURPOSE = "purpose"
+    OUTPUT = "output"
+    ACTIVITY = "activity"
+
+
+class DQAStatus(str, enum.Enum):
+    GOOD = "good"
+    ACCEPTABLE = "acceptable"
+    POOR = "poor"
+    CRITICAL = "critical"
+
+
+class RiskLikelihood(str, enum.Enum):
+    VERY_LOW = "very_low"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    VERY_HIGH = "very_high"
+
+
+class RiskImpact(str, enum.Enum):
+    NEGLIGIBLE = "negligible"
+    MINOR = "minor"
+    MODERATE = "moderate"
+    MAJOR = "major"
+    SEVERE = "severe"
+
+
+class RiskStatus(str, enum.Enum):
+    IDENTIFIED = "identified"
+    MITIGATING = "mitigating"
+    MONITORING = "monitoring"
+    RESOLVED = "resolved"
+    ACCEPTED = "accepted"
+
+
+class MEALPlanStatus(str, enum.Enum):
+    DRAFT = "draft"
+    ACTIVE = "active"
+    COMPLETED = "completed"
+
+
+class NotificationType(str, enum.Enum):
+    DEADLINE = "deadline"
+    COMPLAINT = "complaint"
+    RISK = "risk"
+    TASK = "task"
+    SYSTEM = "system"
+
+
+class CHSCommitment(str, enum.Enum):
+    CHS1 = "chs1"
+    CHS2 = "chs2"
+    CHS3 = "chs3"
+    CHS4 = "chs4"
+    CHS5 = "chs5"
+    CHS6 = "chs6"
+    CHS7 = "chs7"
+    CHS8 = "chs8"
+    CHS9 = "chs9"
+
+
+class FieldVisitStatus(str, enum.Enum):
+    PLANNED = "planned"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
+
+
+class RecommendationStatus(str, enum.Enum):
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    OVERDUE = "overdue"
+    CANCELLED = "cancelled"
+
+
+class ComplianceArea(str, enum.Enum):
+    CHS = "chs"
+    AAP = "aap"
+    PSEA = "psea"
+    DO_NO_HARM = "do_no_harm"
+    DATA_PROTECTION = "data_protection"
+    SAFEGUARDING = "safeguarding"
+    DONOR_COMPLIANCE = "donor_compliance"
+
+
+class ComplianceStatus(str, enum.Enum):
+    COMPLIANT = "compliant"
+    PARTIALLY_COMPLIANT = "partially_compliant"
+    NON_COMPLIANT = "non_compliant"
+    NOT_ASSESSED = "not_assessed"
+
+
+class AuditAction(str, enum.Enum):
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
+    LOGIN = "login"
+    EXPORT = "export"
+    STATUS_CHANGE = "status_change"
+
+
+class SatisfactionLevel(str, enum.Enum):
+    VERY_SATISFIED = "very_satisfied"
+    SATISFIED = "satisfied"
+    NEUTRAL = "neutral"
+    DISSATISFIED = "dissatisfied"
+    VERY_DISSATISFIED = "very_dissatisfied"
+
+
+class SensitivityLevel(str, enum.Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
 # ==================== MODELS ====================
 
 class User(Base):
@@ -631,3 +773,289 @@ class OfflineQueue(Base):
     synced = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     synced_at = Column(DateTime)
+
+
+# -- Complaint Responses --
+
+class ComplaintResponse(Base):
+    __tablename__ = "complaint_responses"
+    id = Column(Integer, primary_key=True, index=True)
+    complaint_id = Column(Integer, ForeignKey("complaints.id"), nullable=False)
+    response_text = Column(Text, nullable=False)
+    action_taken = Column(Text)
+    responded_by = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# -- Action Reviews (AAR) --
+
+class ActionReview(Base):
+    __tablename__ = "action_reviews"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(500), nullable=False)
+    activity_name = Column(String(500), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    review_date = Column(Date)
+    what_was_planned = Column(Text)
+    what_happened = Column(Text)
+    what_went_well = Column(Text)
+    what_to_improve = Column(Text)
+    action_items = Column(Text)
+    participants = Column(Text)
+    created_by = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# -- Case Studies --
+
+class CaseStudy(Base):
+    __tablename__ = "case_studies"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(500), nullable=False)
+    summary = Column(Text, nullable=False)
+    background = Column(Text)
+    intervention = Column(Text)
+    results = Column(Text)
+    impact_statement = Column(Text)
+    quotes = Column(Text)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    sector = Column(String(100))
+    governorate = Column(String(100))
+    beneficiary_name = Column(String(255))
+    consent_obtained = Column(Boolean, default=False)
+    photo_url = Column(String(1000))
+    tags = Column(Text)
+    is_published = Column(Boolean, default=False)
+    created_by = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# -- Data Quality Assessment --
+
+class DataQualityAssessment(Base):
+    __tablename__ = "data_quality_assessments"
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    form_id = Column(Integer, ForeignKey("data_forms.id"))
+    assessment_date = Column(Date, default=date.today)
+    total_records = Column(Integer, default=0)
+    complete_records = Column(Integer, default=0)
+    accuracy_score = Column(Float, default=0)
+    timeliness_score = Column(Float, default=0)
+    consistency_score = Column(Float, default=0)
+    overall_score = Column(Float, default=0)
+    status = Column(String(20), default="good")
+    findings = Column(Text)
+    recommendations = Column(Text)
+    assessed_by = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# -- IPTT Entries --
+
+class IPTTEntry(Base):
+    __tablename__ = "iptt_entries"
+    id = Column(Integer, primary_key=True, index=True)
+    indicator_id = Column(Integer, ForeignKey("indicators.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+    period = Column(String(20), nullable=False)
+    year = Column(Integer, nullable=False)
+    month = Column(Integer)
+    quarter = Column(Integer)
+    target_value = Column(Float, default=0)
+    actual_value = Column(Float, default=0)
+    cumulative_target = Column(Float, default=0)
+    cumulative_actual = Column(Float, default=0)
+    achievement_rate = Column(Float, default=0)
+    status_color = Column(String(10), default="green")
+    deviation_explanation = Column(Text)
+    corrective_action = Column(Text)
+    data_source = Column(String(255))
+    entered_by = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# -- Recommendations --
+
+class Recommendation(Base):
+    __tablename__ = "recommendations"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(500), nullable=False)
+    description = Column(Text)
+    source = Column(String(100))
+    source_id = Column(Integer)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    assigned_to = Column(String(255))
+    responsible_department = Column(String(255))
+    deadline = Column(Date)
+    status = Column(String(50), default="pending")
+    progress_notes = Column(Text)
+    completion_date = Column(Date)
+    priority = Column(String(50), default="medium")
+    created_by = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# -- Compliance Assessment --
+
+class ComplianceAssessment(Base):
+    __tablename__ = "compliance_assessments"
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    area = Column(String(50), nullable=False)
+    standard = Column(String(255), nullable=False)
+    requirement = Column(Text, nullable=False)
+    status = Column(String(50), default="not_assessed")
+    score = Column(Integer, default=0)
+    evidence = Column(Text)
+    gaps = Column(Text)
+    action_plan = Column(Text)
+    responsible_person = Column(String(255))
+    deadline = Column(Date)
+    assessed_by = Column(Integer, ForeignKey("users.id"))
+    assessment_date = Column(Date, default=date.today)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# -- CHS Assessment --
+
+class CHSAssessment(Base):
+    __tablename__ = "chs_assessments"
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    commitment = Column(String(10), nullable=False)
+    score = Column(Integer, default=0)
+    evidence = Column(Text)
+    gaps = Column(Text)
+    action_plan = Column(Text)
+    assessed_by = Column(Integer, ForeignKey("users.id"))
+    assessment_date = Column(Date, default=date.today)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# -- Safeguarding Reports --
+
+class SafeguardingReport(Base):
+    __tablename__ = "safeguarding_reports"
+    id = Column(Integer, primary_key=True, index=True)
+    reference_number = Column(String(50), unique=True, index=True)
+    incident_type = Column(String(100), nullable=False)
+    description = Column(Text, nullable=False)
+    incident_date = Column(Date)
+    location = Column(String(255))
+    is_confidential = Column(Boolean, default=True)
+    status = Column(String(50), default="reported")
+    action_taken = Column(Text)
+    reported_by = Column(Integer, ForeignKey("users.id"))
+    assigned_to = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# -- Needs Assessment --
+
+class NeedsAssessment(Base):
+    __tablename__ = "needs_assessments"
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    title = Column(String(500), nullable=False)
+    sector = Column(String(100), nullable=False)
+    assessment_type = Column(String(100))
+    governorate = Column(String(100))
+    district = Column(String(100))
+    assessment_date = Column(Date)
+    methodology = Column(Text)
+    findings = Column(Text)
+    priorities = Column(Text)
+    recommendations = Column(Text)
+    sample_size = Column(Integer)
+    households_surveyed = Column(Integer)
+    created_by = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# -- Sector Indicators --
+
+class SectorIndicator(Base):
+    __tablename__ = "sector_indicators"
+    id = Column(Integer, primary_key=True, index=True)
+    sector = Column(String(100), nullable=False)
+    indicator_code = Column(String(50), nullable=False)
+    indicator_name = Column(String(500), nullable=False)
+    definition = Column(Text)
+    calculation_method = Column(Text)
+    data_source = Column(String(255))
+    frequency = Column(String(50))
+    disaggregation = Column(Text)
+    target = Column(Float)
+    unit = Column(String(50))
+    is_standard = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+# -- Report Templates --
+
+class ReportTemplate(Base):
+    __tablename__ = "report_templates"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(255), nullable=False)
+    description = Column(Text)
+    report_type = Column(String(50), default="custom")
+    template_config = Column(Text)
+    created_by = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+# -- Survey --
+
+class Survey(Base):
+    __tablename__ = "surveys"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(500), nullable=False)
+    description = Column(Text)
+    project_id = Column(Integer, ForeignKey("projects.id"))
+    survey_type = Column(String(50))
+    status = Column(String(20), default="draft")
+    target_sample = Column(Integer)
+    created_by = Column(Integer, ForeignKey("users.id"))
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class SurveyQuestion(Base):
+    __tablename__ = "survey_questions"
+    id = Column(Integer, primary_key=True, index=True)
+    survey_id = Column(Integer, ForeignKey("surveys.id"), nullable=False)
+    question_text = Column(Text, nullable=False)
+    question_type = Column(String(50), default="text")
+    options = Column(Text)
+    is_required = Column(Boolean, default=True)
+    order = Column(Integer, default=0)
+
+
+class SurveyResponse(Base):
+    __tablename__ = "survey_responses"
+    id = Column(Integer, primary_key=True, index=True)
+    question_id = Column(Integer, ForeignKey("survey_questions.id"), nullable=False)
+    respondent_id = Column(Integer, ForeignKey("beneficiaries.id"))
+    answer = Column(Text)
+    collected_by = Column(Integer, ForeignKey("users.id"))
+    collected_at = Column(DateTime, default=datetime.utcnow)
+    governorate = Column(String(100))
+
+
+# -- Attendance --
+
+class Attendance(Base):
+    __tablename__ = "attendance"
+    id = Column(Integer, primary_key=True, index=True)
+    employee_id = Column(Integer, ForeignKey("employees.id"), nullable=False)
+    date = Column(Date, nullable=False)
+    check_in = Column(DateTime)
+    check_out = Column(DateTime)
+    status = Column(String(20), default="present")
+    notes = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)

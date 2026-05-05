@@ -4,7 +4,11 @@ from app.models import (
     User, Beneficiary, Project, Activity, Indicator, Measurement,
     Grant, Transaction, Employee, Warehouse, InventoryItem, Distribution,
     CashTransfer, DataForm, Complaint, LogFrame, FieldVisit,
-    RiskRegister, LessonLearned, MEALPlan, Document, Notification
+    RiskRegister, LessonLearned, MEALPlan, Document, Notification,
+    ComplaintResponse, ActionReview, CaseStudy, DataQualityAssessment,
+    IPTTEntry, Recommendation, ComplianceAssessment, CHSAssessment,
+    SafeguardingReport, NeedsAssessment, SectorIndicator, ReportTemplate,
+    Attendance
 )
 from app.auth import get_password_hash
 import random
@@ -365,5 +369,233 @@ def seed_database(db: Session):
                 notification_type=random.choice(["alert", "info", "warning"]),
                 is_read=random.random() > 0.5
             ))
+
+    db.flush()
+
+    # Complaint Responses
+    complaints_all = db.query(Complaint).all()
+    for c in complaints_all[:10]:
+        db.add(ComplaintResponse(
+            complaint_id=c.id,
+            response_text=random.choice(["تم التواصل مع المستفيد وتوضيح الإجراءات", "تمت الإحالة للقسم المختص", "تم حل المشكلة بنجاح"]),
+            action_taken=random.choice(["تحويل", "معالجة مباشرة", "إحالة خارجية"]),
+            responded_by=random.choice([1, 2, 3]),
+        ))
+
+    # Action Reviews (AAR)
+    for i in range(5):
+        db.add(ActionReview(
+            title=f"مراجعة عمل {i+1} - {random.choice(['توزيع غذائي', 'تقييم احتياجات', 'زيارة ميدانية', 'تدريب مجتمعي'])}",
+            activity_name=random.choice(["توزيع سلال غذائية", "تقييم صحي", "تدريب متطوعين", "مسح ميداني"]),
+            project_id=random.randint(1, 7),
+            review_date=date(2024, random.randint(1, 12), random.randint(1, 28)),
+            what_was_planned="تنفيذ النشاط حسب الخطة المعتمدة",
+            what_happened="تم تنفيذ النشاط مع بعض التحديات اللوجستية",
+            what_went_well="تفاعل المجتمع كان إيجابياً والتنسيق مع السلطات المحلية",
+            what_to_improve="تحسين التوقيت وزيادة عدد الفريق الميداني",
+            action_items="متابعة التوصيات خلال أسبوعين",
+            participants="فريق MEAL، مدير المشروع، المتطوعين",
+            created_by=random.choice([1, 2, 3]),
+        ))
+
+    # Case Studies
+    case_studies_data = [
+        ("قصة نجاح: تحسين صحة الأطفال في تعز", "الصحة", "تعز"),
+        ("تمكين النساء من خلال برنامج سبل العيش في عدن", "الأمن الغذائي", "عدن"),
+        ("إعادة تأهيل مصادر المياه في مأرب", "المياه والصرف الصحي", "مأرب"),
+    ]
+    for title, sector, gov in case_studies_data:
+        db.add(CaseStudy(
+            title=title,
+            summary=f"دراسة حالة حول أثر التدخلات في قطاع {sector}",
+            background="الوضع قبل التدخل",
+            intervention="التدخلات المنفذة",
+            results="النتائج المحققة",
+            impact_statement="الأثر الإيجابي على حياة المستفيدين",
+            project_id=random.randint(1, 7),
+            sector=sector,
+            governorate=gov,
+            beneficiary_name="اسم مستعار",
+            consent_obtained=True,
+            is_published=True,
+            created_by=2,
+        ))
+
+    # Data Quality Assessments
+    for i in range(3):
+        db.add(DataQualityAssessment(
+            project_id=random.randint(1, 7),
+            form_id=1,
+            total_records=random.randint(50, 200),
+            complete_records=random.randint(30, 150),
+            accuracy_score=round(random.uniform(65, 98), 1),
+            timeliness_score=round(random.uniform(70, 95), 1),
+            consistency_score=round(random.uniform(60, 95), 1),
+            overall_score=round(random.uniform(65, 95), 1),
+            status=random.choice(["good", "acceptable", "poor"]),
+            findings="تحليل جودة البيانات",
+            recommendations="توصيات لتحسين الجودة",
+            assessed_by=2,
+        ))
+
+    # IPTT Entries
+    indicators_all = db.query(Indicator).all()
+    for ind in indicators_all[:6]:
+        for month in range(1, 13):
+            target_val = round(random.uniform(50, 200), 1)
+            actual_val = round(random.uniform(30, 220), 1)
+            cumul_target = round(target_val * month, 1)
+            cumul_actual = round(actual_val * month * random.uniform(0.7, 1.1), 1)
+            achievement = round((actual_val / target_val * 100) if target_val > 0 else 0, 1)
+            db.add(IPTTEntry(
+                indicator_id=ind.id,
+                project_id=ind.project_id,
+                period="monthly",
+                year=2024,
+                month=month,
+                target_value=target_val,
+                actual_value=actual_val,
+                cumulative_target=cumul_target,
+                cumulative_actual=cumul_actual,
+                achievement_rate=achievement,
+                status_color="green" if achievement >= 80 else "yellow" if achievement >= 50 else "red",
+                entered_by=random.choice([1, 2]),
+            ))
+
+    # Recommendations
+    rec_sources = ["تقييم", "زيارة ميدانية", "تقرير مراجعة", "مراجعة عمل"]
+    rec_titles = [
+        "تحسين آلية التوزيع لضمان الوصول العادل",
+        "تعزيز آليات التغذية الراجعة من المستفيدين",
+        "تدريب الفريق الميداني على جمع البيانات",
+        "مراجعة معايير الاستهداف",
+        "تحسين التنسيق مع السلطات المحلية",
+        "تعزيز آليات الرقابة على جودة الخدمات",
+        "تحسين نظام إدارة الشكاوى",
+        "زيادة التواصل مع المجتمعات المستهدفة",
+    ]
+    for i, title in enumerate(rec_titles):
+        db.add(Recommendation(
+            title=title,
+            description=f"تفاصيل التوصية: {title}",
+            source=random.choice(rec_sources),
+            project_id=random.randint(1, 7),
+            assigned_to=random.choice(["فريق MEAL", "مدير المشروع", "مسؤول الميداني"]),
+            responsible_department=random.choice(["البرامج", "MEAL", "الميداني"]),
+            deadline=date(2025, random.randint(1, 12), random.randint(1, 28)),
+            status=random.choice(["pending", "in_progress", "completed"]),
+            priority=random.choice(["high", "medium", "low"]),
+            created_by=random.choice([1, 2, 3]),
+        ))
+
+    # Compliance Assessments
+    chs_areas = [
+        ("chs", "CHS 1", "الاستجابة مناسبة وملائمة"),
+        ("chs", "CHS 2", "الاستجابة فعالة وفي الوقت المناسب"),
+        ("chs", "CHS 3", "الاستجابة تعزز القدرات المحلية"),
+        ("aap", "AAP-1", "مشاركة المعلومات مع المجتمعات المتأثرة"),
+        ("psea", "PSEA-1", "سياسة الحماية من الاستغلال والانتهاك الجنسي"),
+        ("data_protection", "DP-1", "حماية بيانات المستفيدين"),
+    ]
+    for area, standard, requirement in chs_areas:
+        db.add(ComplianceAssessment(
+            project_id=random.randint(1, 5),
+            area=area,
+            standard=standard,
+            requirement=requirement,
+            status=random.choice(["compliant", "partially_compliant", "non_compliant"]),
+            score=random.randint(1, 5),
+            evidence="أدلة التقييم متوفرة",
+            gaps="فجوات محددة" if random.random() > 0.5 else None,
+            action_plan="خطة لسد الفجوات",
+            assessed_by=2,
+        ))
+
+    # CHS Assessments
+    for commitment in ["chs1", "chs2", "chs3", "chs4", "chs5", "chs6", "chs7", "chs8", "chs9"]:
+        db.add(CHSAssessment(
+            project_id=1,
+            commitment=commitment,
+            score=random.randint(1, 5),
+            evidence="أدلة على الالتزام بالمعيار",
+            gaps="فجوات تحتاج معالجة" if random.random() > 0.5 else None,
+            action_plan="خطة عمل لتحسين الأداء",
+            assessed_by=2,
+        ))
+
+    # Safeguarding Reports
+    sg_types = ["تحرش", "استغلال", "إساءة سلطة", "عنف قائم على النوع", "إهمال"]
+    for i in range(5):
+        db.add(SafeguardingReport(
+            reference_number=f"SG-2024-{i+1:04d}",
+            incident_type=random.choice(sg_types),
+            description="تفاصيل البلاغ السري",
+            incident_date=date(2024, random.randint(1, 12), random.randint(1, 28)),
+            location=random.choice(GOVERNORATES),
+            is_confidential=True,
+            status=random.choice(["reported", "investigating", "resolved", "closed"]),
+            action_taken="تم اتخاذ إجراءات فورية" if random.random() > 0.5 else None,
+            reported_by=random.choice([1, 2, 3]),
+        ))
+
+    # Needs Assessments
+    na_sectors = ["WASH", "FSL", "Health", "Education", "Protection", "Shelter"]
+    for i, sector in enumerate(na_sectors):
+        db.add(NeedsAssessment(
+            project_id=random.randint(1, 7),
+            title=f"تقييم احتياجات {sector} - {random.choice(GOVERNORATES)}",
+            sector=sector,
+            assessment_type=random.choice(["rapid", "comprehensive", "joint"]),
+            governorate=random.choice(GOVERNORATES),
+            district="المديرية",
+            assessment_date=date(2024, random.randint(1, 12), random.randint(1, 28)),
+            methodology="مسح ميداني باستخدام استبيانات معيارية",
+            findings="نتائج التقييم الأولية",
+            priorities="الأولويات المحددة",
+            recommendations="التوصيات",
+            sample_size=random.randint(100, 500),
+            households_surveyed=random.randint(50, 200),
+            created_by=2,
+        ))
+
+    # Sector Indicators
+    sector_indicators_data = [
+        ("الحماية", "PROT-1", "عدد حالات الحماية المحالة", "حالة", "شهري"),
+        ("الحماية", "PROT-2", "عدد الناجيات من GBV اللاتي تلقين خدمات", "شخص", "شهري"),
+        ("WASH", "WASH-1", "عدد المستفيدين من مصادر مياه محسنة", "شخص", "ربع سنوي"),
+        ("WASH", "WASH-2", "عدد المراحيض المبنية/المعاد تأهيلها", "مرحاض", "شهري"),
+        ("الصحة", "HLT-1", "عدد الاستشارات الصحية المقدمة", "استشارة", "شهري"),
+        ("الصحة", "HLT-2", "نسبة تغطية التطعيمات", "%", "ربع سنوي"),
+        ("التعليم", "EDU-1", "عدد الأطفال المسجلين في مساحات التعلم", "طفل", "شهري"),
+        ("التعليم", "EDU-2", "نسبة الحضور المنتظم", "%", "شهري"),
+        ("الأمن الغذائي", "FSL-1", "عدد الأسر المستفيدة من التوزيع الغذائي", "أسرة", "شهري"),
+        ("الأمن الغذائي", "FSL-2", "متوسط درجة التنوع الغذائي (HDDS)", "درجة", "ربع سنوي"),
+        ("المأوى", "SHL-1", "عدد المآوي المقدمة/المعاد تأهيلها", "مأوى", "شهري"),
+        ("التغذية", "NUT-1", "عدد الأطفال المعالجين من سوء التغذية الحاد", "طفل", "شهري"),
+    ]
+    for sector, code, name, unit, freq in sector_indicators_data:
+        db.add(SectorIndicator(
+            sector=sector,
+            indicator_code=code,
+            indicator_name=name,
+            definition=f"تعريف مؤشر {name}",
+            unit=unit,
+            frequency=freq,
+            is_standard=True,
+        ))
+
+    # Report Templates
+    report_templates = [
+        ("تقرير تقدم المشروع الشهري", "project_progress", "قالب تقرير شهري عن تقدم المشروع"),
+        ("تقرير المانح الربع سنوي", "financial_summary", "قالب تقرير ربع سنوي للمانحين"),
+        ("تقرير تتبع المؤشرات", "indicator_tracking", "قالب تقرير تتبع أداء المؤشرات"),
+    ]
+    for name, rtype, desc in report_templates:
+        db.add(ReportTemplate(
+            name=name,
+            description=desc,
+            report_type=rtype,
+            created_by=1,
+        ))
 
     db.commit()
