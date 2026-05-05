@@ -21,6 +21,24 @@ import DataCollection from './pages/DataCollection';
 import Reports from './pages/Reports';
 import Documents from './pages/Documents';
 import Risks from './pages/Risks';
+import AIInsights from './pages/AIInsights';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
+import AssessmentTools from './pages/AssessmentTools';
+import AuditTrail from './pages/AuditTrail';
+import ComplianceDashboard from './pages/ComplianceDashboard';
+import EvaluationTools from './pages/EvaluationTools';
+import ExecutiveDashboard from './pages/ExecutiveDashboard';
+import FeedbackLoop from './pages/FeedbackLoop';
+import Integrations from './pages/Integrations';
+import IPTTDashboard from './pages/IPTTDashboard';
+import KoBoIntegration from './pages/KoBoIntegration';
+import NeedsAssessment from './pages/NeedsAssessment';
+import OfflineMode from './pages/OfflineMode';
+import Recommendations from './pages/Recommendations';
+import RemoteMonitoring from './pages/RemoteMonitoring';
+import Safeguarding from './pages/Safeguarding';
+import ScheduledReports from './pages/ScheduledReports';
+import SectorIndicators from './pages/SectorIndicators';
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -55,6 +73,24 @@ function AppRoutes() {
       <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
       <Route path="/documents" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
       <Route path="/risks" element={<ProtectedRoute><Risks /></ProtectedRoute>} />
+      <Route path="/ai-insights" element={<ProtectedRoute><AIInsights /></ProtectedRoute>} />
+      <Route path="/analytics" element={<ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>} />
+      <Route path="/assessment-tools" element={<ProtectedRoute><AssessmentTools /></ProtectedRoute>} />
+      <Route path="/audit-trail" element={<ProtectedRoute><AuditTrail /></ProtectedRoute>} />
+      <Route path="/compliance" element={<ProtectedRoute><ComplianceDashboard /></ProtectedRoute>} />
+      <Route path="/evaluation-tools" element={<ProtectedRoute><EvaluationTools /></ProtectedRoute>} />
+      <Route path="/executive" element={<ProtectedRoute><ExecutiveDashboard /></ProtectedRoute>} />
+      <Route path="/feedback-loop" element={<ProtectedRoute><FeedbackLoop /></ProtectedRoute>} />
+      <Route path="/integrations" element={<ProtectedRoute><Integrations /></ProtectedRoute>} />
+      <Route path="/iptt" element={<ProtectedRoute><IPTTDashboard /></ProtectedRoute>} />
+      <Route path="/kobo" element={<ProtectedRoute><KoBoIntegration /></ProtectedRoute>} />
+      <Route path="/needs-assessment" element={<ProtectedRoute><NeedsAssessment /></ProtectedRoute>} />
+      <Route path="/offline-mode" element={<ProtectedRoute><OfflineMode /></ProtectedRoute>} />
+      <Route path="/recommendations" element={<ProtectedRoute><Recommendations /></ProtectedRoute>} />
+      <Route path="/remote-monitoring" element={<ProtectedRoute><RemoteMonitoring /></ProtectedRoute>} />
+      <Route path="/safeguarding" element={<ProtectedRoute><Safeguarding /></ProtectedRoute>} />
+      <Route path="/scheduled-reports" element={<ProtectedRoute><ScheduledReports /></ProtectedRoute>} />
+      <Route path="/sector-indicators" element={<ProtectedRoute><SectorIndicators /></ProtectedRoute>} />
     </Routes>
   );
 }

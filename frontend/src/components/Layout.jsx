@@ -5,7 +5,9 @@ import {
   LayoutDashboard, Users, FolderKanban, DollarSign, UserCog, Package,
   BarChart3, ClipboardList, FileText, MessageSquareWarning, GraduationCap,
   Target, MapPin, ShieldAlert, BookOpen, Bell, LogOut, Menu, X,
-  Banknote, FileSearch, Wifi, WifiOff, ChevronDown
+  Banknote, FileSearch, Wifi, WifiOff, ChevronDown, Brain, PieChart,
+  FileSpreadsheet, History, Shield, Gauge, MessageCircle, Plug,
+  Globe, Radio, Calendar, List, Eye, CheckSquare, Award
 } from 'lucide-react';
 
 const menuGroups = [
@@ -45,12 +47,45 @@ const menuGroups = [
     ]
   },
   {
-    title: 'أدوات',
+    title: 'التقييم والتحليلات',
+    items: [
+      { path: '/analytics', label: 'التحليلات المتقدمة', icon: PieChart },
+      { path: '/executive', label: 'لوحة تنفيذية', icon: Gauge },
+      { path: '/iptt', label: 'تتبع المؤشرات IPTT', icon: Target },
+      { path: '/evaluation-tools', label: 'أدوات التقييم', icon: FileSpreadsheet },
+      { path: '/assessment-tools', label: 'أدوات التقييم PDM', icon: CheckSquare },
+      { path: '/needs-assessment', label: 'تقييم الاحتياجات', icon: List },
+      { path: '/sector-indicators', label: 'مؤشرات قطاعية', icon: Award },
+    ]
+  },
+  {
+    title: 'الجودة والامتثال',
+    items: [
+      { path: '/compliance', label: 'الامتثال CHS', icon: Shield },
+      { path: '/safeguarding', label: 'الحماية', icon: ShieldAlert },
+      { path: '/recommendations', label: 'التوصيات', icon: MessageCircle },
+      { path: '/feedback-loop', label: 'حلقة التغذية الراجعة', icon: MessageSquareWarning },
+      { path: '/audit-trail', label: 'سجل التدقيق', icon: History },
+    ]
+  },
+  {
+    title: 'أدوات وتقارير',
     items: [
       { path: '/data-collection', label: 'جمع البيانات', icon: ClipboardList },
       { path: '/reports', label: 'التقارير', icon: FileText },
+      { path: '/scheduled-reports', label: 'تقارير مجدولة', icon: Calendar },
       { path: '/documents', label: 'الوثائق', icon: FileText },
       { path: '/risks', label: 'المخاطر', icon: ShieldAlert },
+    ]
+  },
+  {
+    title: 'التكامل والذكاء',
+    items: [
+      { path: '/ai-insights', label: 'المساعد الذكي', icon: Brain },
+      { path: '/kobo', label: 'KoBoToolbox', icon: Globe },
+      { path: '/integrations', label: 'التكاملات', icon: Plug },
+      { path: '/remote-monitoring', label: 'المراقبة عن بعد', icon: Radio },
+      { path: '/offline-mode', label: 'وضع عدم الاتصال', icon: WifiOff },
     ]
   }
 ];
